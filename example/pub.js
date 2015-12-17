@@ -56,44 +56,6 @@ var leverage = new Leverage(
 var missing = {}
   , tracked;
 
-leverage.subscribe('channel', {
-  ordered: 'ordered' in argh ? argh.ordered : false,
-  replay:  'replay'  in argh ? argh.replay  : 0
-}).on('channel::message', function message(msg, pid) {
-  if (id && id + 1 !== pid) {
-    console.log('The process has gone out of sync and is missing %d messages', pid - id);
-    console.log('The last id received was %d but ive been given %d', id, pid);
-
-    //
-    // Track messages that were missing
-    //
-    if (!tracked) {
-      var now = id;
-      tracked = true;
-
-      while (now !== pid) {
-        missing[++now] = true;
-      }
-    }
-  }
-
-  id = pid;
-
-  //if (id % 10 === 0) console.log('Received %d messages through Pub/Sub', pid);
-  console.log('recv', msg, pid);
-
-  if (Object.keys(missing).length) {
-    delete missing[pid];
-
-    if (!Object.keys(missing).length) {
-      console.log('Received all messages from when our process went out of sync');
-      tracked = false;
-    } else {
-      console.log('Missing', missing);
-    }
-  }
-});
-
 //
 // Track potential error message througout the Pub/Sub shizzle.
 //
@@ -101,10 +63,6 @@ leverage.on('channel::error', function error(err) {
   console.errror('[channel::errror] '+ err.message);
 });
 
-var msgIdx = 0;
 setInterval(function () {
-  msgIdx++;
-  var msg = 'sup'+ id + 'ord:' + msgIdx;
-  leverage.publish('channel', msg);
-  console.log('send', msg);
-}, 1000);
+  leverage.publish('channel', 'sup'+ id);
+}, 100);

@@ -79,8 +79,7 @@ leverage.subscribe('channel', {
 
   id = pid;
 
-  //if (id % 10 === 0) console.log('Received %d messages through Pub/Sub', pid);
-  console.log('recv', msg, pid);
+  if (id % 10 === 0) console.log('Received %d messages through Pub/Sub', pid);
 
   if (Object.keys(missing).length) {
     delete missing[pid];
@@ -100,11 +99,3 @@ leverage.subscribe('channel', {
 leverage.on('channel::error', function error(err) {
   console.errror('[channel::errror] '+ err.message);
 });
-
-var msgIdx = 0;
-setInterval(function () {
-  msgIdx++;
-  var msg = 'sup'+ id + 'ord:' + msgIdx;
-  leverage.publish('channel', msg);
-  console.log('send', msg);
-}, 1000);
